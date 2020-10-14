@@ -1,4 +1,4 @@
-package domain
+package user
 
 // User defines the core User of the app
 type User struct {
