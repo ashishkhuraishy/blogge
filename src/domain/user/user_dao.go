@@ -12,13 +12,15 @@ var (
 )
 
 const (
-	queryInsertUser    = `INSERT INTO users(username, email, password, date_created, date_updated) VALUES($1, $2, $3, $4, $5) RETURNING id;`
-	queryGetUserWithID = `SELECT id, username, email, password, date_created, date_updated FROM users WHERE id=$1;`
+	queryInsertUser = `INSERT INTO users(username, email, password, date_created, date_updated) VALUES($1, $2, $3, $4, $5) RETURNING id;`
+	queryGetUser    = `SELECT id, username, email, password, date_created, date_updated FROM users WHERE id=$1;`
+	queryUpdateUser = `UPDATE users SET username=$1, email=$2, password=$3, date_created=$4, date_updated=$5 WHERE id=$6`
+	queryDeleteUser = `DELETE users WHERE id=$1`
 )
 
 // Get : retrives a user with the id / returns a [RestError]
 func (u *User) Get() *resterror.RestError {
-	stmnt, err := psql.Client.Prepare(queryGetUserWithID)
+	stmnt, err := psql.Client.Prepare(queryGetUser)
 	defer stmnt.Close()
 	if err != nil {
 		log.Println(err)
@@ -68,8 +70,45 @@ func (u *User) Save() *resterror.RestError {
 	return nil
 }
 
+// Update updates the user with the given info
+func (u *User) Update() *resterror.RestError {
+	stmnt, err := psql.Client.Prepare(queryUpdateUser)
+	defer stmnt.Close()
+	if err != nil {
+		log.Println(err)
+		return resterror.NewInternalServerError("database_error")
+	}
+
+	_, err = stmnt.Exec(
+		u.UserName,
+		u.Email,
+		u.Password,
+		u.DateCreated,
+		u.DateUpdated,
+		u.ID,
+	)
+
+	if err != nil {
+		log.Println(err)
+		return resterror.NewInternalServerError("database_error")
+	}
+
+	return nil
+}
+
 // Delete used to delete a user from the db
 func (u *User) Delete() *resterror.RestError {
+	stmnt, err := psql.Client.Prepare(queryUpdateUser)
+	defer stmnt.Close()
+	if err != nil {
+		log.Println(err)
+		return resterror.NewInternalServerError("database_error")
+	}
 
+	_, err = stmnt.Exec(u.ID)
+	if err != nil {
+		log.Println(err)
+		return resterror.NewInternalServerError("database_error")
+	}
 	return nil
 }

@@ -23,9 +23,6 @@ func (u *User) Validate() *resterror.RestError {
 	u.Email = strings.TrimSpace(u.Email)
 	u.UserName = strings.TrimSpace(u.UserName)
 
-	if u.ID < 1 {
-		return resterror.NewBadRequest("invalid id")
-	}
 	if u.Email == "" {
 		return resterror.NewBadRequest("email cannot be empty")
 	}
