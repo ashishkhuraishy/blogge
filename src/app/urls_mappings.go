@@ -1,6 +1,6 @@
 package app
 
-import "github.com/ashishkhuraishy/blogge/controller"
+import "github.com/ashishkhuraishy/blogge/src/controller"
 
 func mapUrls() {
 	router.GET("/ping", controller.PingController.Ping)

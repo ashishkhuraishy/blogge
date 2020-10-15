@@ -1,8 +1,6 @@
 package user
 
-import (
-	"github.com/ashishkhuraishy/blogge/utils/errors/resterror"
-)
+import "github.com/ashishkhuraishy/blogge/src/utils/errors/resterror"
 
 var (
 	users = make(map[int64]*User, 0)

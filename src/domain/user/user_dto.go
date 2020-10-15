@@ -3,7 +3,7 @@ package user
 import (
 	"strings"
 
-	"github.com/ashishkhuraishy/blogge/utils/errors/resterror"
+	"github.com/ashishkhuraishy/blogge/src/utils/errors/resterror"
 )
 
 // User defines the core User of the app

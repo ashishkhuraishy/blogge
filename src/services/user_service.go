@@ -1,8 +1,8 @@
 package services
 
 import (
-	"github.com/ashishkhuraishy/blogge/domain/user"
-	"github.com/ashishkhuraishy/blogge/utils/errors/resterror"
+	"github.com/ashishkhuraishy/blogge/src/domain/user"
+	"github.com/ashishkhuraishy/blogge/src/utils/errors/resterror"
 )
 
 var (

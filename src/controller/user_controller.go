@@ -5,9 +5,9 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/ashishkhuraishy/blogge/domain/user"
-	"github.com/ashishkhuraishy/blogge/services"
-	"github.com/ashishkhuraishy/blogge/utils/errors/resterror"
+	"github.com/ashishkhuraishy/blogge/src/domain/user"
+	"github.com/ashishkhuraishy/blogge/src/services"
+	"github.com/ashishkhuraishy/blogge/src/utils/errors/resterror"
 	"github.com/gin-gonic/gin"
 )
 
