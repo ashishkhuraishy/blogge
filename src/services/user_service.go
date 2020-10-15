@@ -2,6 +2,7 @@ package services
 
 import (
 	"github.com/ashishkhuraishy/blogge/src/domain/user"
+	"github.com/ashishkhuraishy/blogge/src/utils/datetime"
 	"github.com/ashishkhuraishy/blogge/src/utils/errors/resterror"
 )
 
@@ -24,6 +25,9 @@ func (u *userService) CreateUser(user user.User) (*user.User, *resterror.RestErr
 	if err := user.Validate(); err != nil {
 		return nil, err
 	}
+
+	user.DateCreated = datetime.GetCurrentFormattedTime()
+	user.DateUpdated = user.DateCreated
 
 	if err := user.Save(); err != nil {
 		return nil, err
