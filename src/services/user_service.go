@@ -5,6 +5,7 @@ import (
 	"strconv"
 
 	"github.com/ashishkhuraishy/blogge/src/domain/user"
+	"github.com/ashishkhuraishy/blogge/src/utils/cryptoutils"
 	"github.com/ashishkhuraishy/blogge/src/utils/datetime"
 	"github.com/ashishkhuraishy/blogge/src/utils/errors/resterror"
 )
@@ -31,11 +32,14 @@ func (u *userService) CreateUser(user user.User) (*user.User, *resterror.RestErr
 		return nil, err
 	}
 
+	user.Password = cryptoutils.HashPassword(user.Password)
 	user.DateCreated = datetime.GetCurrentFormattedTime()
 	user.DateUpdated = user.DateCreated
 
-	restErr := user.Save()
-	return &user, restErr
+	if restErr := user.Save(); restErr != nil {
+		return nil, restErr
+	}
+	return &user, nil
 }
 
 // GetUser gets a specific user with the given id
@@ -43,7 +47,7 @@ func (u *userService) CreateUser(user user.User) (*user.User, *resterror.RestErr
 func (u *userService) GetUser(idParam string) (*user.User, *resterror.RestError) {
 	id, err := strconv.ParseInt(idParam, 10, 64)
 
-	if err != nil {
+	if err != nil || id < 1 {
 		return nil, resterror.NewBadRequest(fmt.Sprintf("%s is not a valid user id", idParam))
 	}
 
@@ -63,6 +67,10 @@ func (u *userService) UpdateUser(idParam string, usr user.User, isPartial bool) 
 	currentUser, restErr := u.GetUser(idParam)
 	if restErr != nil {
 		return nil, restErr
+	}
+
+	if usr.Password != "" {
+		usr.Password = cryptoutils.HashPassword(usr.Password)
 	}
 
 	if isPartial {
@@ -97,9 +105,9 @@ func (u *userService) DeleteUser(idParam string) *resterror.RestError {
 		return resterror.NewBadRequest(fmt.Sprintf("%s is not a valid user id", idParam))
 	}
 
-	user := &user.User{
+	usr := &user.User{
 		ID: id,
 	}
 
-	return user.Delete()
+	return usr.Delete()
 }

@@ -17,8 +17,8 @@ type User struct {
 }
 
 // Validate is used to validate wheather
-// the current user provided is a valid user or
-// not
+// the current user provided is a valid
+// user or not
 func (u *User) Validate() *resterror.RestError {
 	u.Email = strings.TrimSpace(u.Email)
 	u.UserName = strings.TrimSpace(u.UserName)
