@@ -2,10 +2,6 @@ package user
 
 import "github.com/ashishkhuraishy/blogge/src/utils/errors/resterror"
 
-var (
-	users = make(map[int64]*User, 0)
-)
-
 // Get : retrives a user with the id / returns a [RestError]
 func (u *User) Get() *resterror.RestError {
 	user := users[u.ID]
