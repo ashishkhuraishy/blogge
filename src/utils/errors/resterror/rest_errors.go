@@ -21,11 +21,21 @@ func NewNotFoundError(message string) *RestError {
 }
 
 // NewBadRequest returns a RestError
-// in the format of abd request
+// in the format of a bad request
 func NewBadRequest(message string) *RestError {
 	return &RestError{
 		Message:    message,
 		StatusCode: http.StatusBadRequest,
 		Error:      "bad_request",
+	}
+}
+
+// NewInternalServerError returns a RestError
+// whenever something goes wrong in the server side
+func NewInternalServerError(message string) *RestError {
+	return &RestError{
+		Message:    message,
+		StatusCode: http.StatusInternalServerError,
+		Error:      "internal_server_error",
 	}
 }
