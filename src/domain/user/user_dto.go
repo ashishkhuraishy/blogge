@@ -16,6 +16,13 @@ type User struct {
 	DateUpdated string `json:"date_updated"`
 }
 
+// AuthResponse contains the user data that will be returned
+// after signup / login
+type AuthResponse struct {
+	Profile interface{} `json:"profile"`
+	Token   string      `json:"token"`
+}
+
 // Validate is used to validate wheather
 // the current user provided is a valid
 // user or not

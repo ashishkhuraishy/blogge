@@ -26,6 +26,18 @@ type userControllerInterface interface {
 
 type userController struct{}
 
+// SignUp godoc
+// @Summary SignUp API
+// @Description creates a new user based on the info
+// @Accept  json
+// @Produce  json
+// @Param username body string true "UserName"
+// @Param email body string true "Email"
+// @Param password body string true "Password"
+// @Success 200 {object} user.AuthResponse{Profile=user.PrivateUser}
+// @Failure 400 {object} resterror.RestError
+// @Failure 500 {object} resterror.RestError
+// @Router /signup [post]
 func (u *userController) SignUp(c *gin.Context) {
 	var usr user.User
 
@@ -45,10 +57,26 @@ func (u *userController) SignUp(c *gin.Context) {
 	authService := services.JWTAuthService()
 	token := authService.GenerateToken(result.ID, false)
 
-	c.JSON(http.StatusOK, gin.H{"profile": result.Marshaller(true), "token": token})
+	response := &user.AuthResponse{
+		Profile: result.Marshaller(true),
+		Token:   token,
+	}
+
+	c.JSON(http.StatusOK, response)
 }
 
 // Login used to validate a user and generate a token
+// Login godoc
+// @Summary Login API
+// @Description Will login the user if the credentials are right
+// @Accept  json
+// @Produce  json
+// @Param email body string true "Email"
+// @Param password body string true "Password"
+// @Success 200 {object} user.AuthResponse{Profile=user.PrivateUser}
+// @Failure 400 {object} resterror.RestError
+// @Failure 500 {object} resterror.RestError
+// @Router /login [post]
 func (u *userController) Login(c *gin.Context) {
 	var usr user.User
 
@@ -68,11 +96,28 @@ func (u *userController) Login(c *gin.Context) {
 	authService := services.JWTAuthService()
 	token := authService.GenerateToken(result.ID, false)
 
-	c.JSON(http.StatusOK, gin.H{"profile": result.Marshaller(true), "token": token})
+	response := &user.AuthResponse{
+		Profile: result.Marshaller(true),
+		Token:   token,
+	}
+
+	c.JSON(http.StatusOK, response)
 }
 
 // GetUser converts takes a url parameter and checks if there is a valid user
 // with that given id and returns the user
+// GetUser godoc
+// @Summary GetUser API
+// @Description gets a user with the given id
+// @Accept  json
+// @Produce  json
+// @Param id path integer true "User ID"
+// @Success 200 {object} user.PrivateUser
+// @Failure 400 {object} resterror.RestError
+// @Failure 404 {object} resterror.RestError
+// @Failure 500 {object} resterror.RestError
+// @Router /user/{id} [get]
+// @Security ApiKeyAuth
 func (u *userController) GetUser(c *gin.Context) {
 	id, _, isOwner, restErr := extractUserInfo(c)
 	if restErr != nil {
@@ -91,6 +136,21 @@ func (u *userController) GetUser(c *gin.Context) {
 
 // GetUser converts takes a url parameter and checks if there is a valid user
 // with that given id and returns the user
+// UpdateUser godoc
+// @Summary Update User API
+// @Description updates a user with the given id
+// @Accept  json
+// @Produce  json
+// @Param id path integer true "User ID"
+// @Param username body string true "UserName"
+// @Param email body string true "Email"
+// @Param password body string true "Password"
+// @Success 200 {object} user.PrivateUser
+// @Failure 400 {object} resterror.RestError
+// @Failure 401 {object} resterror.RestError
+// @Failure 500 {object} resterror.RestError
+// @Router /user/{id} [put]
+// @Security ApiKeyAuth
 func (u *userController) Update(c *gin.Context) {
 	var user user.User
 	id, _, isOwner, restErr := extractUserInfo(c)
@@ -123,6 +183,18 @@ func (u *userController) Update(c *gin.Context) {
 
 // Delete converts takes a url parameter and checks if there is a valid user
 // with that given id and returns the user
+// UpdateUser godoc
+// @Summary Update User API
+// @Description updates a user with the given id
+// @Accept  json
+// @Produce  json
+// @Param id path integer true "User ID"
+// @Success 200 {object} user.PrivateUser
+// @Failure 400 {object} resterror.RestError
+// @Failure 401 {object} resterror.RestError
+// @Failure 500 {object} resterror.RestError
+// @Router /user/{id} [delete]
+// @Security ApiKeyAuth
 func (u *userController) Delete(c *gin.Context) {
 	id, _, isOwner, restErr := extractUserInfo(c)
 	if restErr != nil {

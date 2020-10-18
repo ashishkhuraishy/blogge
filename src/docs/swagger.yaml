@@ -1,0 +1,233 @@
+definitions:
+  resterror.RestError:
+    properties:
+      error:
+        type: string
+      message:
+        type: string
+      status_code:
+        type: integer
+    type: object
+  user.AuthResponse:
+    properties:
+      profile:
+        type: object
+      token:
+        type: string
+    type: object
+  user.PrivateUser:
+    properties:
+      date_created:
+        type: string
+      date_updated:
+        type: string
+      email:
+        type: string
+      id:
+        type: integer
+      username:
+        type: string
+    type: object
+info:
+  contact: {}
+paths:
+  /login:
+    post:
+      consumes:
+      - application/json
+      description: Will login the user if the credentials are right
+      parameters:
+      - description: Email
+        in: body
+        name: email
+        required: true
+        schema:
+          type: string
+      - description: Password
+        in: body
+        name: password
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/user.AuthResponse'
+            - properties:
+                Profile:
+                  $ref: '#/definitions/user.PrivateUser'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/resterror.RestError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/resterror.RestError'
+      summary: Login API
+  /signup:
+    post:
+      consumes:
+      - application/json
+      description: creates a new user based on the info
+      parameters:
+      - description: UserName
+        in: body
+        name: username
+        required: true
+        schema:
+          type: string
+      - description: Email
+        in: body
+        name: email
+        required: true
+        schema:
+          type: string
+      - description: Password
+        in: body
+        name: password
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/user.AuthResponse'
+            - properties:
+                Profile:
+                  $ref: '#/definitions/user.PrivateUser'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/resterror.RestError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/resterror.RestError'
+      summary: SignUp API
+  /user/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: updates a user with the given id
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/user.PrivateUser'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/resterror.RestError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/resterror.RestError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/resterror.RestError'
+      security:
+      - ApiKeyAuth: []
+      summary: Update User API
+    get:
+      consumes:
+      - application/json
+      description: gets a user with the given id
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/user.PrivateUser'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/resterror.RestError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/resterror.RestError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/resterror.RestError'
+      security:
+      - ApiKeyAuth: []
+      summary: GetUser API
+    put:
+      consumes:
+      - application/json
+      description: updates a user with the given id
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: UserName
+        in: body
+        name: username
+        required: true
+        schema:
+          type: string
+      - description: Email
+        in: body
+        name: email
+        required: true
+        schema:
+          type: string
+      - description: Password
+        in: body
+        name: password
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/user.PrivateUser'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/resterror.RestError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/resterror.RestError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/resterror.RestError'
+      security:
+      - ApiKeyAuth: []
+      summary: Update User API
+swagger: "2.0"
