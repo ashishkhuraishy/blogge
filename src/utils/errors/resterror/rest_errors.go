@@ -57,7 +57,7 @@ func NewUnAuthorizedError() *RestError {
 func NewInvalidCredentialsError() *RestError {
 	return &RestError{
 		Message:    "invalid credentials",
-		StatusCode: http.StatusNonAuthoritativeInfo,
-		Error:      "unauthorized",
+		StatusCode: http.StatusUnauthorized,
+		Error:      "access_denied",
 	}
 }

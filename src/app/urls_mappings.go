@@ -8,7 +8,7 @@ import (
 func mapUrls() {
 	router.GET("/ping", controller.PingController.Ping)
 
-	router.POST("/signup", controller.UserController.Create)
+	router.POST("/signup", controller.UserController.SignUp)
 	router.POST("/login", controller.UserController.Login)
 
 	userGroup := router.Group("/user", middleware.AuthMiddleware())
