@@ -18,6 +18,7 @@ var (
 // UserServiceInterface public interface for userService
 type userServiceInterface interface {
 	CreateUser(user.User) (*user.User, *resterror.RestError)
+	LoginService(user.User) (*user.User, *resterror.RestError)
 	GetUser(string) (*user.User, *resterror.RestError)
 	UpdateUser(string, user.User, bool) (*user.User, *resterror.RestError)
 	DeleteUser(string) *resterror.RestError
@@ -57,6 +58,29 @@ func (u *userService) GetUser(idParam string) (*user.User, *resterror.RestError)
 
 	restErr := usr.Get()
 	return usr, restErr
+}
+
+// LoginService recives a user with username and pass and will try to authenticate
+// the user with the data on db
+func (u *userService) LoginService(usr user.User) (*user.User, *resterror.RestError) {
+	if err := usr.ValidateEmail(); err != nil {
+		return nil, err
+	}
+
+	if usr.Password == "" {
+		return nil, resterror.NewInvalidCredentialsError()
+	}
+
+	currentUser, err := usr.GetUserByEmail()
+	if err != nil {
+		return nil, resterror.NewInvalidCredentialsError()
+	}
+
+	if !cryptoutils.VerifyPasswordAndHash(usr.Password, currentUser.Password) {
+		return nil, resterror.NewInvalidCredentialsError()
+	}
+
+	return currentUser, nil
 }
 
 // UpdateUser is used to update a user either fully or a single data about the

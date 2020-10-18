@@ -13,7 +13,7 @@ func AuthMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		authHeader := c.GetHeader("authorization")
 		if authHeader == "" || len(authHeader) < len("Token")+1 {
-			restErr := resterror.NewUnAuthorizedError("token required")
+			restErr := resterror.NewUnAuthorizedError()
 			c.JSON(restErr.StatusCode, restErr)
 			c.Abort()
 			return
@@ -24,7 +24,7 @@ func AuthMiddleware() gin.HandlerFunc {
 		authService := services.JWTAuthService()
 		result, err := authService.ValidateToken(token)
 		if err != nil || !result.Valid {
-			restErr := resterror.NewUnAuthorizedError("invalid token")
+			restErr := resterror.NewUnAuthorizedError()
 			c.JSON(restErr.StatusCode, restErr)
 			c.Abort()
 			return

@@ -43,10 +43,21 @@ func NewInternalServerError(message string) *RestError {
 // NewUnAuthorizedError returns a RestError
 // whenever some unauthorized user tries to
 // get data from a secured endpoint
-func NewUnAuthorizedError(message string) *RestError {
+func NewUnAuthorizedError() *RestError {
 	return &RestError{
-		Message:    message,
+		Message:    "invalid token",
 		StatusCode: http.StatusUnauthorized,
+		Error:      "unauthorized",
+	}
+}
+
+// NewInvalidCredentialsError returns a RestError
+// whenever some unauthorized user tries to
+// get data from a secured endpoint
+func NewInvalidCredentialsError() *RestError {
+	return &RestError{
+		Message:    "invalid credentials",
+		StatusCode: http.StatusNonAuthoritativeInfo,
 		Error:      "unauthorized",
 	}
 }

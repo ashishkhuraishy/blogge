@@ -20,21 +20,22 @@ type userControllerInterface interface {
 	GetUser(*gin.Context)
 	Update(*gin.Context)
 	Delete(*gin.Context)
+	Login(*gin.Context)
 }
 
 type userController struct{}
 
 func (u *userController) Create(c *gin.Context) {
-	var user user.User
+	var usr user.User
 
-	err := c.BindJSON(&user)
+	err := c.BindJSON(&usr)
 	if err != nil {
 		resterr := resterror.NewBadRequest("invalid json")
 		c.JSON(resterr.StatusCode, resterr)
 		return
 	}
 
-	result, resterr := services.UserService.CreateUser(user)
+	result, resterr := services.UserService.CreateUser(usr)
 	if resterr != nil {
 		c.JSON(resterr.StatusCode, resterr)
 		return
@@ -43,7 +44,30 @@ func (u *userController) Create(c *gin.Context) {
 	authService := services.JWTAuthService()
 	token := authService.GenerateToken(result.ID, false)
 
-	c.JSON(http.StatusOK, map[string]interface{}{"user": result, "token": token})
+	c.JSON(http.StatusOK, gin.H{"profile": result.Marshaller(true), "token": token})
+}
+
+// Login used to validate a user and generate a token
+func (u *userController) Login(c *gin.Context) {
+	var usr user.User
+
+	err := c.BindJSON(&usr)
+	if err != nil {
+		resterr := resterror.NewBadRequest("invalid json")
+		c.JSON(resterr.StatusCode, resterr)
+		return
+	}
+
+	result, resterr := services.UserService.LoginService(usr)
+	if resterr != nil {
+		c.JSON(resterr.StatusCode, resterr)
+		return
+	}
+
+	authService := services.JWTAuthService()
+	token := authService.GenerateToken(result.ID, false)
+
+	c.JSON(http.StatusOK, gin.H{"profile": result.Marshaller(true), "token": token})
 }
 
 // GetUser converts takes a url parameter and checks if there is a valid user
@@ -95,6 +119,8 @@ func (u *userController) Delete(c *gin.Context) {
 	c.JSON(http.StatusOK, map[string]string{"message": "user removed sucessfully"})
 }
 
+// GetDataFromMiddleware is a helper fn used to extract data
+// from the auth middleware
 func getDataFromMiddleWare(c *gin.Context) (int64, bool, error) {
 	requestedUser := int64(c.GetFloat64("user_id"))
 	isAdmin := c.GetBool("is_admin")

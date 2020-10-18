@@ -8,10 +8,15 @@ import (
 func mapUrls() {
 	router.GET("/ping", controller.PingController.Ping)
 
-	router.POST("/user", controller.UserController.Create)
-	router.GET("/user/:user_id", middleware.AuthMiddleware(), controller.UserController.GetUser)
-	router.PUT("/user/:user_id", controller.UserController.Update)
-	router.PATCH("/user/:user_id", controller.UserController.Update)
-	router.DELETE("/user/:user_id", controller.UserController.Delete)
+	router.POST("/signup", controller.UserController.Create)
+	router.POST("/login", controller.UserController.Login)
+
+	userGroup := router.Group("/user", middleware.AuthMiddleware())
+	{
+		userGroup.GET("/:user_id", controller.UserController.GetUser)
+		userGroup.PUT("/:user_id", controller.UserController.Update)
+		userGroup.PATCH("/:user_id", controller.UserController.Update)
+		userGroup.DELETE("/:user_id", controller.UserController.Delete)
+	}
 
 }

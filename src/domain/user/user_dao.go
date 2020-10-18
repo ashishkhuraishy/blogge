@@ -9,10 +9,11 @@ import (
 )
 
 const (
-	queryInsertUser = `INSERT INTO users(username, email, password, date_created, date_updated) VALUES($1, $2, $3, $4, $5) RETURNING id;`
-	queryGetUser    = `SELECT id, username, email, password, date_created, date_updated FROM users WHERE id=$1;`
-	queryUpdateUser = `UPDATE users SET username=$1, email=$2, password=$3, date_created=$4, date_updated=$5 WHERE id=$6`
-	queryDeleteUser = `DELETE FROM users WHERE id=$1`
+	queryInsertUser     = `INSERT INTO users(username, email, password, date_created, date_updated) VALUES($1, $2, $3, $4, $5) RETURNING id;`
+	queryGetUser        = `SELECT id, username, email, password, date_created, date_updated FROM users WHERE id=$1;`
+	queryGetUserByEmail = `SELECT id, username, email, password, date_created, date_updated FROM users WHERE email=$1;`
+	queryUpdateUser     = `UPDATE users SET username=$1, email=$2, password=$3, date_created=$4, date_updated=$5 WHERE id=$6`
+	queryDeleteUser     = `DELETE FROM users WHERE id=$1`
 )
 
 // Get : retrives a user with the id / returns a [RestError]
@@ -108,4 +109,34 @@ func (u *User) Delete() *resterror.RestError {
 	}
 
 	return nil
+}
+
+// GetUserByEmail returns a user with the given email address
+func (u *User) GetUserByEmail() (*User, *resterror.RestError) {
+	stmnt, err := psql.Client.Prepare(queryGetUserByEmail)
+	defer stmnt.Close()
+	if err != nil {
+		log.Println(err)
+		return nil, psqlerrors.ParseErrors(err)
+	}
+
+	var user User
+
+	err = stmnt.QueryRow(
+		u.Email,
+	).Scan(
+		&user.ID,
+		&user.UserName,
+		&user.Email,
+		&user.Password,
+		&user.DateCreated,
+		&user.DateUpdated,
+	)
+
+	if err != nil {
+		log.Println(err)
+		return nil, psqlerrors.ParseErrors(err)
+	}
+
+	return &user, nil
 }
