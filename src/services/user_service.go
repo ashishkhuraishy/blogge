@@ -1,9 +1,6 @@
 package services
 
 import (
-	"fmt"
-	"strconv"
-
 	"github.com/ashishkhuraishy/blogge/src/domain/user"
 	"github.com/ashishkhuraishy/blogge/src/utils/cryptoutils"
 	"github.com/ashishkhuraishy/blogge/src/utils/datetime"
@@ -18,9 +15,10 @@ var (
 // UserServiceInterface public interface for userService
 type userServiceInterface interface {
 	CreateUser(user.User) (*user.User, *resterror.RestError)
-	GetUser(string) (*user.User, *resterror.RestError)
-	UpdateUser(string, user.User, bool) (*user.User, *resterror.RestError)
-	DeleteUser(string) *resterror.RestError
+	LoginService(user.User) (*user.User, *resterror.RestError)
+	GetUser(int64) (*user.User, *resterror.RestError)
+	UpdateUser(int64, user.User, bool) (*user.User, *resterror.RestError)
+	DeleteUser(int64) *resterror.RestError
 }
 
 // UserService - to define user services
@@ -44,12 +42,7 @@ func (u *userService) CreateUser(user user.User) (*user.User, *resterror.RestErr
 
 // GetUser gets a specific user with the given id
 // if any or else will return a not found error
-func (u *userService) GetUser(idParam string) (*user.User, *resterror.RestError) {
-	id, err := strconv.ParseInt(idParam, 10, 64)
-
-	if err != nil || id < 1 {
-		return nil, resterror.NewBadRequest(fmt.Sprintf("%s is not a valid user id", idParam))
-	}
+func (u *userService) GetUser(id int64) (*user.User, *resterror.RestError) {
 
 	usr := &user.User{
 		ID: id,
@@ -59,12 +52,35 @@ func (u *userService) GetUser(idParam string) (*user.User, *resterror.RestError)
 	return usr, restErr
 }
 
+// LoginService recives a user with username and pass and will try to authenticate
+// the user with the data on db
+func (u *userService) LoginService(usr user.User) (*user.User, *resterror.RestError) {
+	if err := usr.ValidateEmail(); err != nil {
+		return nil, err
+	}
+
+	if usr.Password == "" {
+		return nil, resterror.NewInvalidCredentialsError()
+	}
+
+	currentUser, err := usr.GetUserByEmail()
+	if err != nil {
+		return nil, resterror.NewInvalidCredentialsError()
+	}
+
+	if !cryptoutils.VerifyPasswordAndHash(usr.Password, currentUser.Password) {
+		return nil, resterror.NewInvalidCredentialsError()
+	}
+
+	return currentUser, nil
+}
+
 // UpdateUser is used to update a user either fully or a single data about the
 // the user. If the `isPartial` is true then only a part of the data will be
 // updated where as if `isPartial` is false the whole new data will be added
 // after removing all the old data
-func (u *userService) UpdateUser(idParam string, usr user.User, isPartial bool) (*user.User, *resterror.RestError) {
-	currentUser, restErr := u.GetUser(idParam)
+func (u *userService) UpdateUser(id int64, usr user.User, isPartial bool) (*user.User, *resterror.RestError) {
+	currentUser, restErr := u.GetUser(id)
 	if restErr != nil {
 		return nil, restErr
 	}
@@ -98,13 +114,7 @@ func (u *userService) UpdateUser(idParam string, usr user.User, isPartial bool) 
 }
 
 // DeleteUser will delete a user with the given id if the user exist
-func (u *userService) DeleteUser(idParam string) *resterror.RestError {
-	id, err := strconv.ParseInt(idParam, 10, 64)
-
-	if err != nil {
-		return resterror.NewBadRequest(fmt.Sprintf("%s is not a valid user id", idParam))
-	}
-
+func (u *userService) DeleteUser(id int64) *resterror.RestError {
 	usr := &user.User{
 		ID: id,
 	}

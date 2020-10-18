@@ -14,3 +14,13 @@ func HashPassword(password string) string {
 
 	return hex.EncodeToString(hash.Sum(nil))
 }
+
+// VerifyPasswordAndHash will check if the current hash
+// and the given password are same
+func VerifyPasswordAndHash(password string, currentHash string) bool {
+	if HashPassword(password) == currentHash {
+		return true
+	}
+
+	return false
+}

@@ -23,14 +23,28 @@ func (u *User) Validate() *resterror.RestError {
 	u.Email = strings.TrimSpace(u.Email)
 	u.UserName = strings.TrimSpace(u.UserName)
 
-	if u.Email == "" {
-		return resterror.NewBadRequest("email cannot be empty")
+	if err := u.ValidateEmail(); err != nil {
+		return err
 	}
+
 	if u.UserName == "" {
 		return resterror.NewBadRequest("username cannot be empty")
 	}
 	if len(u.Password) < 6 {
 		return resterror.NewBadRequest("password is too short")
+	}
+
+	return nil
+}
+
+// ValidateEmail will trim and check if the email is valid
+// or not and returns a rest error if invalid
+func (u *User) ValidateEmail() *resterror.RestError {
+	u.Email = strings.ToLower(u.Email)
+	u.Email = strings.TrimSpace(u.Email)
+
+	if u.Email == "" || !strings.Contains(u.Email, "@") || !strings.Contains(u.Email, ".") {
+		return resterror.NewBadRequest("invalid email")
 	}
 
 	return nil
