@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"errors"
 	"net/http"
 
 	"github.com/ashishkhuraishy/blogge/src/domain/user"
@@ -39,14 +40,16 @@ func (u *userController) Create(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, result)
+	authService := services.JWTAuthService()
+	token := authService.GenerateToken(result.ID, false)
+
+	c.JSON(http.StatusOK, map[string]interface{}{"user": result, "token": token})
 }
 
 // GetUser converts takes a url parameter and checks if there is a valid user
 // with that given id and returns the user
 func (u *userController) GetUser(c *gin.Context) {
 	idParam := c.Param("user_id")
-
 	result, restErr := services.UserService.GetUser(idParam)
 	if restErr != nil {
 		c.JSON(restErr.StatusCode, restErr)
@@ -90,4 +93,15 @@ func (u *userController) Delete(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, map[string]string{"message": "user removed sucessfully"})
+}
+
+func getDataFromMiddleWare(c *gin.Context) (int64, bool, error) {
+	requestedUser := int64(c.GetFloat64("user_id"))
+	isAdmin := c.GetBool("is_admin")
+
+	if requestedUser == 0 {
+		return 0, false, errors.New("corrupted token")
+	}
+
+	return requestedUser, isAdmin, nil
 }

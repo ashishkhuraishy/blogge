@@ -39,3 +39,14 @@ func NewInternalServerError(message string) *RestError {
 		Error:      "internal_server_error",
 	}
 }
+
+// NewUnAuthorizedError returns a RestError
+// whenever some unauthorized user tries to
+// get data from a secured endpoint
+func NewUnAuthorizedError(message string) *RestError {
+	return &RestError{
+		Message:    message,
+		StatusCode: http.StatusUnauthorized,
+		Error:      "unauthorized",
+	}
+}

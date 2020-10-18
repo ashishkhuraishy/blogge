@@ -1,55 +1,39 @@
 package middleware
 
 import (
-	"os"
-
+	"github.com/ashishkhuraishy/blogge/src/services"
+	"github.com/ashishkhuraishy/blogge/src/utils/errors/resterror"
 	"github.com/dgrijalva/jwt-go"
+	"github.com/gin-gonic/gin"
 )
 
-// JWTService will generate and validate a token to authenticate
-// a user before processing request
-type JWTService interface {
-	GenerateToken(int64, bool) string
-	ValidateToken(string) (*jwt.Token, error)
-}
+// AuthMiddleware checks for a token validates it then redirects
+// the request to secured endpoint
+func AuthMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		authHeader := c.GetHeader("authorization")
+		if authHeader == "" || len(authHeader) < len("Token")+1 {
+			restErr := resterror.NewUnAuthorizedError("token required")
+			c.JSON(restErr.StatusCode, restErr)
+			c.Abort()
+			return
+		}
 
-type authClaims struct {
-	UserID  int64 `json:"user_id"`
-	IsAdmin bool  `json:"is_admin"`
-	jwt.StandardClaims
-}
+		token := authHeader[len("Token "):]
 
-type jwtService struct {
-	secretKey string
-	issuer    string
-}
+		authService := services.JWTAuthService()
+		result, err := authService.ValidateToken(token)
+		if err != nil || !result.Valid {
+			restErr := resterror.NewUnAuthorizedError("invalid token")
+			c.JSON(restErr.StatusCode, restErr)
+			c.Abort()
+			return
+		}
 
-// JWTAuthService is used to generate a public constructor for
-// creating an instance of the service
-func JWTAuthService() JWTService {
-	return &jwtService{
-		secretKey: getSecretKey(),
-		issuer:    "Ashish Khuraishy",
+		claims := result.Claims.(jwt.MapClaims)
+		c.Set("user_id", claims["user_id"])
+		c.Set("is_admin", claims["is_admin"])
+
+		c.Next()
 	}
-}
-
-func getSecretKey() string {
-	sercretKey := os.Getenv("JWT_SECRET_KEY")
-	if sercretKey == "" {
-		sercretKey = "SECRET_KEY"
-	}
-
-	return sercretKey
-}
-
-func (s *jwtService) GenerateToken(userID int64, isAdmin bool) string {
-	claims := &authClaims{
-		UserID:  userID,
-		IsAdmin: isAdmin,
-	}
-	return ""
-}
-
-func (s *jwtService) ValidateToken(string) (*jwt.Token, error) {
-	return nil, nil
 }
