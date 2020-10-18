@@ -21,11 +21,43 @@ func NewNotFoundError(message string) *RestError {
 }
 
 // NewBadRequest returns a RestError
-// in the format of abd request
+// in the format of a bad request
 func NewBadRequest(message string) *RestError {
 	return &RestError{
 		Message:    message,
 		StatusCode: http.StatusBadRequest,
 		Error:      "bad_request",
+	}
+}
+
+// NewInternalServerError returns a RestError
+// whenever something goes wrong in the server side
+func NewInternalServerError(message string) *RestError {
+	return &RestError{
+		Message:    message,
+		StatusCode: http.StatusInternalServerError,
+		Error:      "internal_server_error",
+	}
+}
+
+// NewUnAuthorizedError returns a RestError
+// whenever some unauthorized user tries to
+// get data from a secured endpoint
+func NewUnAuthorizedError() *RestError {
+	return &RestError{
+		Message:    "invalid token",
+		StatusCode: http.StatusUnauthorized,
+		Error:      "unauthorized",
+	}
+}
+
+// NewInvalidCredentialsError returns a RestError
+// whenever some unauthorized user tries to
+// get data from a secured endpoint
+func NewInvalidCredentialsError() *RestError {
+	return &RestError{
+		Message:    "invalid credentials",
+		StatusCode: http.StatusUnauthorized,
+		Error:      "access_denied",
 	}
 }
