@@ -16,6 +16,7 @@ const (
 	psqlPassword = "PSQL_PASSWORD"
 	psqlPort     = "PSQL_PORT"
 	psqlDBName   = "PSQL_DB_NAME"
+	psqlHost     = "PSQL_DB_HOST"
 )
 
 var (
@@ -30,7 +31,7 @@ func init() {
 	godotenv.Load()
 
 	// Generating the connection string
-	connectionStr := fmt.Sprintf("user=%s password=%s dbname=%s port=%s sslmode=disable", os.Getenv(psqlUserName), os.Getenv(psqlPassword), os.Getenv(psqlDBName), os.Getenv(psqlPort))
+	connectionStr := fmt.Sprintf("user=%s password=%s dbname=%s host=%s sslmode=disable", os.Getenv(psqlUserName), os.Getenv(psqlPassword), os.Getenv(psqlDBName), os.Getenv(psqlHost))
 	Client, err = sql.Open("postgres", connectionStr)
 
 	if err != nil {
