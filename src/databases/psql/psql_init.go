@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
-	"os"
 
 	"github.com/joho/godotenv"
 	_ "github.com/lib/pq" //postgress diver
@@ -30,7 +29,7 @@ func init() {
 	godotenv.Load()
 
 	// Generating the connection string
-	connectionStr := fmt.Sprintf("user=%s password=%s dbname=%s port=%s sslmode=disable", os.Getenv(psqlUserName), os.Getenv(psqlPassword), os.Getenv(psqlDBName), os.Getenv(psqlPort))
+	connectionStr := fmt.Sprintf("user=%s password=%s dbname=%s port=%s sslmode=disable", "ashish", "9269", "blogge", "9090")
 	Client, err = sql.Open("postgres", connectionStr)
 
 	if err != nil {
