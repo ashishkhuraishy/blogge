@@ -12,8 +12,8 @@ const (
 	queryInsertUser     = `INSERT INTO users(username, email, password, date_created, date_updated) VALUES($1, $2, $3, $4, $5) RETURNING id;`
 	queryGetUser        = `SELECT id, username, email, password, date_created, date_updated FROM users WHERE id=$1;`
 	queryGetUserByEmail = `SELECT id, username, email, password, date_created, date_updated FROM users WHERE email=$1;`
-	queryUpdateUser     = `UPDATE users SET username=$1, email=$2, password=$3, date_created=$4, date_updated=$5 WHERE id=$6`
-	queryDeleteUser     = `DELETE FROM users WHERE id=$1`
+	queryUpdateUser     = `UPDATE users SET username=$1, email=$2, password=$3, date_created=$4, date_updated=$5 WHERE id=$6;`
+	queryDeleteUser     = `DELETE FROM users WHERE id=$1;`
 )
 
 // Get : retrives a user with the id / returns a [RestError]
