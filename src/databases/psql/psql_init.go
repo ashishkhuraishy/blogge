@@ -30,11 +30,13 @@ func init() {
 	// Load env variables if any locally
 	godotenv.Load()
 
-	pass := os.Getenv("POSTGRES_PASSWORD")
-	log.Printf("Password : %s", pass)
+	host := os.Getenv(psqlHost)
+	if host == "" {
+		host = "localhost"
+	}
 
 	// Generating the connection string
-	connectionStr := fmt.Sprintf("user=%s password=%s dbname=%s host=%s sslmode=disable", os.Getenv(psqlUserName), os.Getenv(psqlPassword), os.Getenv(psqlDBName), os.Getenv(psqlHost))
+	connectionStr := fmt.Sprintf("user=%s password=%s dbname=%s host=%s sslmode=disable", os.Getenv(psqlUserName), os.Getenv(psqlPassword), os.Getenv(psqlDBName), host)
 	log.Println(connectionStr)
 	Client, err = sql.Open("postgres", connectionStr)
 
